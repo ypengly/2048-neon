@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>2048 NEON — Merge. Think. Conquer.</title>
+<meta name="description" content="A premium neon puzzle game. Merge tiles, reach 2048.">
+<link rel="stylesheet" href="style.css">
+</head>
+<body data-theme="dark">
+
+  <div class="bg-scene" aria-hidden="true">
+    <div class="blob blob-a"></div>
+    <div class="blob blob-b"></div>
+    <div class="grid-overlay"></div>
+  </div>
+
+  <div class="app">
+
+    <header class="app-header">
+      <div class="brand">
+        <h1 class="brand-title">2048<span class="brand-title-accent">NEON</span></h1>
+        <p class="brand-tag">Merge. Think. Conquer.</p>
+      </div>
+
+      <div class="header-actions">
+        <button id="theme-toggle" class="icon-btn" type="button" aria-label="Toggle light and dark theme" aria-pressed="false">
+          <svg class="icon icon-moon" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M20.5 14.5A8.5 8.5 0 1 1 9.5 3.5a6.7 6.7 0 0 0 11 11Z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></svg>
+          <svg class="icon icon-sun" viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="12" r="4.2" stroke="currentColor" stroke-width="1.6"/><path d="M12 2.5v2.6M12 18.9v2.6M4.6 4.6l1.9 1.9M17.5 17.5l1.9 1.9M2.5 12h2.6M18.9 12h2.6M4.6 19.4l1.9-1.9M17.5 6.5l1.9-1.9" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+        </button>
+        <button id="sound-toggle" class="icon-btn" type="button" aria-label="Toggle sound" aria-pressed="true">
+          <svg class="icon icon-sound-on" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M4 9.8v4.4h3.4L12 18V6L7.4 9.8H4Z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><path d="M16 9a4 4 0 0 1 0 6M18.5 6.5a8 8 0 0 1 0 11" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+          <svg class="icon icon-sound-off" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M4 9.8v4.4h3.4L12 18V6L7.4 9.8H4Z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><path d="M16.2 9.8l4.2 4.4M20.4 9.8l-4.2 4.4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+        </button>
+      </div>
+    </header>
+
+    <p class="subhead">Combine matching tiles until you reach <strong>2048</strong>.</p>
+
+    <section class="stat-row" aria-label="Game statistics">
+      <div class="stat-card">
+        <span class="stat-label">Score</span>
+        <span class="stat-value" id="score-value">0</span>
+        <span class="score-pop" id="score-pop" aria-hidden="true"></span>
+      </div>
+      <div class="stat-card">
+        <span class="stat-label">Best</span>
+        <span class="stat-value" id="best-value">0</span>
+      </div>
+      <div class="stat-card">
+        <span class="stat-label">Moves</span>
+        <span class="stat-value" id="moves-value">0</span>
+      </div>
+    </section>
+
+    <section class="controls-row">
+      <button id="new-game-btn" class="btn btn-primary" type="button">
+        <span class="btn-icon" aria-hidden="true">+</span> New Game
+      </button>
+      <button id="undo-btn" class="btn btn-ghost" type="button" disabled>
+        <span class="btn-icon" aria-hidden="true">↶</span> Undo
+      </button>
+      <button id="stats-btn" class="btn btn-ghost" type="button">
+        <span class="btn-icon" aria-hidden="true">▤</span> Stats
+      </button>
+    </section>
+
+    <main class="board-wrap">
+      <div class="board" id="board" role="img" aria-label="2048 game board">
+        <div class="board-grid" id="board-grid"></div>
+        <div class="tile-layer" id="tile-layer"></div>
+      </div>
+
+      <div class="board-status" id="board-status" role="status" aria-live="polite"></div>
+    </main>
+
+    <p class="hint-row">
+      <span class="key-hint">← ↑ ↓ →</span> or <span class="key-hint">W A S D</span> &nbsp;·&nbsp; swipe on mobile
+    </p>
+
+    <button id="howto-btn" class="link-btn" type="button">How to play</button>
+
+    <footer class="app-footer">
+      <p>2048 NEON — an independent puzzle experience.</p>
+    </footer>
+  </div>
+
+  <!-- Win Modal -->
+  <div class="modal-backdrop" id="win-modal" hidden>
+    <div class="modal modal-win" role="dialog" aria-modal="true" aria-labelledby="win-title">
+      <div class="modal-confetti" id="win-confetti" aria-hidden="true"></div>
+      <p class="modal-emblem" aria-hidden="true">✨</p>
+      <h2 class="modal-title" id="win-title">2048</h2>
+      <p class="modal-subtitle">You did it.</p>
+      <div class="modal-stats">
+        <div><span class="modal-stat-label">Score</span><span class="modal-stat-value" id="win-score">0</span></div>
+        <div><span class="modal-stat-label">Moves</span><span class="modal-stat-value" id="win-moves">0</span></div>
+      </div>
+      <div class="modal-actions">
+        <button id="keep-playing-btn" class="btn btn-primary" type="button">Keep Playing</button>
+        <button id="win-newgame-btn" class="btn btn-ghost" type="button">New Game</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Game Over Modal -->
+  <div class="modal-backdrop" id="gameover-modal" hidden>
+    <div class="modal modal-over" role="dialog" aria-modal="true" aria-labelledby="over-title">
+      <p class="modal-emblem modal-emblem-muted" aria-hidden="true">◆</p>
+      <h2 class="modal-title" id="over-title">Game Over</h2>
+      <p class="modal-subtitle">No more moves remain.</p>
+      <div class="modal-stats">
+        <div><span class="modal-stat-label">Score</span><span class="modal-stat-value" id="over-score">0</span></div>
+        <div><span class="modal-stat-label">Best</span><span class="modal-stat-value" id="over-best">0</span></div>
+      </div>
+      <div class="modal-actions">
+        <button id="over-newgame-btn" class="btn btn-primary" type="button">Try Again</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- New Game Confirm Modal -->
+  <div class="modal-backdrop" id="confirm-modal" hidden>
+    <div class="modal modal-confirm" role="dialog" aria-modal="true" aria-labelledby="confirm-title">
+      <h2 class="modal-title modal-title-sm" id="confirm-title">Start a new game?</h2>
+      <p class="modal-subtitle">Your current progress will be lost.</p>
+      <div class="modal-actions">
+        <button id="confirm-cancel-btn" class="btn btn-ghost" type="button">Cancel</button>
+        <button id="confirm-ok-btn" class="btn btn-danger" type="button">New Game</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Statistics Modal -->
+  <div class="modal-backdrop" id="stats-modal" hidden>
+    <div class="modal modal-stats-panel" role="dialog" aria-modal="true" aria-labelledby="stats-title">
+      <h2 class="modal-title modal-title-sm" id="stats-title">Statistics</h2>
+      <div class="stats-grid">
+        <div class="stats-item"><span class="stats-item-value" id="stat-best">0</span><span class="stats-item-label">Best Score</span></div>
+        <div class="stats-item"><span class="stats-item-value" id="stat-best-tile">0</span><span class="stats-item-label">Best Tile</span></div>
+        <div class="stats-item"><span class="stats-item-value" id="stat-total-moves">0</span><span class="stats-item-label">Total Moves</span></div>
+        <div class="stats-item"><span class="stats-item-value" id="stat-games-played">0</span><span class="stats-item-label">Games Played</span></div>
+        <div class="stats-item"><span class="stats-item-value" id="stat-games-won">0</span><span class="stats-item-label">Games Won</span></div>
+        <div class="stats-item"><span class="stats-item-value" id="stat-longest">00:00</span><span class="stats-item-label">Longest Game</span></div>
+      </div>
+      <div class="modal-actions">
+        <button id="stats-close-btn" class="btn btn-primary" type="button">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- How To Play Modal -->
+  <div class="modal-backdrop" id="howto-modal" hidden>
+    <div class="modal modal-howto" role="dialog" aria-modal="true" aria-labelledby="howto-title">
+      <h2 class="modal-title modal-title-sm" id="howto-title">How to Play</h2>
+      <p class="howto-text">Use the arrow keys, WASD, or swipe to slide every tile on the board. When two tiles carrying the same number collide, they combine into one.</p>
+      <div class="howto-demo" aria-hidden="true">
+        <div class="howto-tile" data-v="2">2</div>
+        <span class="howto-plus">+</span>
+        <div class="howto-tile" data-v="2">2</div>
+        <span class="howto-eq">=</span>
+        <div class="howto-tile" data-v="4">4</div>
+      </div>
+      <p class="howto-text">Keep merging — 4 becomes 8, 8 becomes 16 — until a tile reaches <strong>2048</strong>. Reach it, and you win. Keep playing for a higher score.</p>
+      <div class="modal-actions">
+        <button id="howto-close-btn" class="btn btn-primary" type="button">Got it</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="sr-only" id="sr-announcer" aria-live="assertive"></div>
+
+  <script src="script.js"></script>
+</body>
+</html>
